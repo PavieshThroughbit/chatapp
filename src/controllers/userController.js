@@ -10,22 +10,16 @@ require('dotenv').config();
 
 const signup = async (req, res, next) => {
     try {
-        const { email, password, name, employeeId, role } = req.body;
+        const { email, password, name, employeeId, role, image } = req.body;
         if (!email || !password || !name || !employeeId || !role) {
             return res.status(401).send({ message: 'Details Missing' });
         }
 
-        let image = null; // Initialize image variable with null
+        // let image = null; // Initialize image variable with null
 
         // if (req.file) {
         //     image = path.basename(req.file.path);
         // }
-
-
-        if (req.file) {
-            image = path.join(__dirname, '..', '..', 'uploads', path.basename(req.file.path));
-            console.log("image", image);
-        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -108,10 +102,10 @@ const editUser = async (req, res, next) => {
         const updateFields = req.body;
 
         // Handle image upload
-        if (req.file) {
-            const image = path.basename(req.file.path);
-            updateFields.image = image;
-        }
+        // if (req.file) {
+        //     const image = path.basename(req.file.path);
+        //     updateFields.image = image;
+        // }
 
         // Check if a new password is provided before hashing
         if (updateFields.password) {
