@@ -17,8 +17,14 @@ const signup = async (req, res, next) => {
 
         let image = null; // Initialize image variable with null
 
+        // if (req.file) {
+        //     image = path.basename(req.file.path);
+        // }
+
+
         if (req.file) {
-            image = path.basename(req.file.path);
+            image = path.join(__dirname, '..', '..', 'uploads', path.basename(req.file.path));
+            console.log("image", image);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
