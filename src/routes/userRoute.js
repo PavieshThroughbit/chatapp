@@ -1,14 +1,12 @@
 const express = require("express");
 const { celebrate, Joi, errors, Segments } = require('celebrate');
-const { signup, signIn,editUser,forgetPassword,allUsers,signOut, protect,getUserProfile,changePwd } = require("../controllers/userController")
-const upload = require("../config/multer");
-const uploadImg = upload.single("image");
-
+const { signup, signIn, editUser, forgetPassword, allUsers, signOut, protect, getUserProfile, changePwd } = require("../controllers/userController")
+const { upload } = require("../config/multer");
 const router = express.Router();
 
 
 router.post("/createUser",
-    uploadImg,
+    upload.single("image"),
     celebrate({
         [Segments.BODY]: Joi.object().keys({
             name: Joi.string().required(),
@@ -37,9 +35,9 @@ router.put("/editUser/:userId", celebrate({
         role: Joi.string().allow('').optional(),
         image: Joi.string().allow('').optional(),
         password: Joi.string().allow('').optional(),
-        employeeId: Joi.string().allow('').optional(), 
+        employeeId: Joi.string().allow('').optional(),
     }),
-}), uploadImg, protect, editUser);
+}), upload.single("image"), protect, editUser);
 
 router.post("/forgetPwd", celebrate({
     [Segments.BODY]: Joi.object().keys({

@@ -70,8 +70,17 @@ const createGroup = async (req, res, next) => {
             return res.status(400).send({ message: "Please Fill all the feilds" });
         }
 
+        let image = null; // Initialize image variable with null
+
+        // Check if req.file is present (uploaded image)
+        if (req.file) {
+            image = req.file.path; // Use the path from multer to store in the database
+        }
+
         let users = JSON.parse(req.body.users);
         // console.log("users", users);
+
+
 
         if (users.length < 2) {
             return res
@@ -86,10 +95,11 @@ const createGroup = async (req, res, next) => {
             users: users,
             isGroupChat: true,
             groupAdmin: req.user,
+            image: image,
         });
-
+       
         const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
-            .populate("users", "-password")
+            .populate("users", "-password",)
             .populate("groupAdmin", "-password");
 
         res.status(200).json(fullGroupChat);
@@ -190,5 +200,5 @@ const addGroupMember = async (req, res, next) => {
 
 
 
-module.exports = { accessChat, fetchChats, createGroup, renameGroup, removeGroupMember,addGroupMember }
+module.exports = { accessChat, fetchChats, createGroup, renameGroup, removeGroupMember, addGroupMember }
 

@@ -1,25 +1,26 @@
 const User = require("../models/userModel");
+const Chat = require("../models/chatModel");
 const bcrypt = require("bcryptjs");
 const { createToken, verifyToken } = require("../config/jwt");
 const { sendMail } = require("../config/mailer");
 const { getRandomString } = require("../config/pwdHandler");
 const { COOKIE_OPTIONS } = require("../config/cookie");
 const { addToBlacklist, isTokenBlacklisted } = require("../config/token");
-const path = require('path');
 require('dotenv').config();
 
 const signup = async (req, res, next) => {
     try {
-        const { email, password, name, employeeId, role, image } = req.body;
+        const { email, password, name, employeeId, role } = req.body;
         if (!email || !password || !name || !employeeId || !role) {
             return res.status(401).send({ message: 'Details Missing' });
         }
 
-        // let image = null; // Initialize image variable with null
+        let image = null; // Initialize image variable with null
 
-        // if (req.file) {
-        //     image = path.basename(req.file.path);
-        // }
+        // Check if req.file is present (uploaded image)
+        if (req.file) {
+            image = req.file.path; // Use the path from multer to store in the database
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -86,9 +87,14 @@ const allUsers = async (req, res, next) => {
 
         // Use the filter in the User.find() query
         const users = await User.find(filter);
+        
+        // Find the group chat with the specified chatName
+        const chatNameFilter = searchTerms.length > 0 ? { chatName: new RegExp(search, 'i'), isGroupChat: true } : {};
+        const groupChats = await Chat.find(chatNameFilter);
 
         res.status(200).json({
             users,
+            groupChats,
         });
     } catch (err) {
         next(err);
@@ -101,11 +107,10 @@ const editUser = async (req, res, next) => {
         const userId = req.params.userId;
         const updateFields = req.body;
 
-        // Handle image upload
-        // if (req.file) {
-        //     const image = path.basename(req.file.path);
-        //     updateFields.image = image;
-        // }
+        // Check if req.file is present (uploaded image)
+        if (req.file) {
+            updateFields.image = req.file.path; // Use the path from multer to store in the database
+        }
 
         // Check if a new password is provided before hashing
         if (updateFields.password) {

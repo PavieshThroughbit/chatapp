@@ -10,6 +10,10 @@ const chatModel = mongoose.Schema(
             type: Boolean,
             default: false
         },
+        image: {
+            type: "String",
+            default: 'https://readerbee-profile-image.s3.us-west-2.amazonaws.com/77.png1658916635585',
+        },
         users: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"

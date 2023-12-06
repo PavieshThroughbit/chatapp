@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema(
         },
         image: {
             type: "String",
-            default: null
+            default: 'https://readerbee-profile-image.s3.us-west-2.amazonaws.com/77.png1658916635585',
         },
         isAdmin: {
             type: Boolean,

@@ -2,6 +2,7 @@ const express = require("express");
 const { accessChat, fetchChats, createGroup, renameGroup, removeGroupMember, addGroupMember } = require("../controllers/chatController");
 const { protect } = require("../controllers/userController");
 const { celebrate, Joi, errors, Segments } = require('celebrate');
+const { upload } = require("../config/multer");
 const router = express.Router();
 
 
@@ -13,12 +14,15 @@ router.post("/accessChat", celebrate({
 
 router.get("/fetchChats", protect, fetchChats);
 
-router.post("/createGroup", celebrate({
-    [Segments.BODY]: Joi.object().keys({
-        name: Joi.string().required(),
-        users: Joi.string().required(),
-    }),
-}), protect, createGroup);
+router.post("/createGroup",
+    upload.single("image"),
+    celebrate({
+        [Segments.BODY]: Joi.object().keys({
+            name: Joi.string().required(),
+            users: Joi.string().required(),
+            image: Joi.string().allow('').optional(),
+        }),
+    }), protect, createGroup);
 
 router.put("/renameGroup", celebrate({
     [Segments.BODY]: Joi.object().keys({
