@@ -71,7 +71,6 @@ const signIn = async (req, res, next) => {
     }
 }
 
-
 const allUsers = async (req, res, next) => {
     try {
         // Extract the search query parameter from the request
@@ -87,14 +86,20 @@ const allUsers = async (req, res, next) => {
 
         // Use the filter in the User.find() query
         const users = await User.find(filter);
-        
+
         // Find the group chat with the specified chatName
         const chatNameFilter = searchTerms.length > 0 ? { chatName: new RegExp(search, 'i'), isGroupChat: true } : {};
+
         const groupChats = await Chat.find(chatNameFilter);
+
+        // Filter groupChats array to include only those with isGroupChat: true
+        const filteredGroupChats = groupChats.filter(chat => chat.isGroupChat);
+
+        console.log(filteredGroupChats);
 
         res.status(200).json({
             users,
-            groupChats,
+            groupChats: filteredGroupChats,
         });
     } catch (err) {
         next(err);
