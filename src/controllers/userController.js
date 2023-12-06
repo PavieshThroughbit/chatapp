@@ -95,7 +95,6 @@ const allUsers = async (req, res, next) => {
         // Filter groupChats array to include only those with isGroupChat: true
         const filteredGroupChats = groupChats.filter(chat => chat.isGroupChat);
 
-        console.log(filteredGroupChats);
 
         res.status(200).json({
             users,
