@@ -15,7 +15,7 @@ const signup = async (req, res, next) => {
             return res.status(401).send({ message: 'Details Missing' });
         }
 
-        let image = null; // Initialize image variable with null
+        let image 
 
         // Check if req.file is present (uploaded image)
         if (req.file) {

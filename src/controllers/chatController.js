@@ -99,7 +99,7 @@ const createGroup = async (req, res, next) => {
             return res.status(400).send({ message: "Please Fill all the feilds" });
         }
 
-        let image = null; // Initialize image variable with null
+        let image 
 
         // Check if req.file is present (uploaded image)
         if (req.file) {
