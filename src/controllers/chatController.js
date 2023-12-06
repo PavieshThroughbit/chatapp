@@ -44,6 +44,35 @@ const accessChat = async (req, res, next) => {
     }
 };
 
+const accessGroupChat = async (req, res, next) => {
+    try {
+        const { groupId } = req.body;
+
+        if (!groupId) {
+            return res.status(400).json({ message: 'Invalid group information' });
+        }
+
+        // Query the Chat model to find the group with the provided groupId
+        const group = await Chat.findById(groupId).populate("users", "-password");
+
+        if (!group) {
+            return res.status(404).json({ message: 'Group not found' });
+        }
+
+        // Check if req.user._id is in the users array of the group
+        const userInGroup = group.users.some(user => user._id.toString() === req.user._id.toString());
+
+        if (!userInGroup) {
+            return res.status(403).json({ message: 'User not authorized to access this group' });
+        }
+
+        res.status(200).json(group);
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 
 const fetchChats = async (req, res, next) => {
     try {
@@ -97,7 +126,7 @@ const createGroup = async (req, res, next) => {
             groupAdmin: req.user,
             image: image,
         });
-       
+
         const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
             .populate("users", "-password",)
             .populate("groupAdmin", "-password");
@@ -200,5 +229,5 @@ const addGroupMember = async (req, res, next) => {
 
 
 
-module.exports = { accessChat, fetchChats, createGroup, renameGroup, removeGroupMember, addGroupMember }
+module.exports = { accessChat, fetchChats, createGroup, accessGroupChat, renameGroup, removeGroupMember, addGroupMember }
 
