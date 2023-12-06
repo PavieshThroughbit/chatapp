@@ -52,7 +52,15 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
+
   socket.on("setup", (userData) => {
+    if (!userData) {
+      // If userData is undefined or null, emit an error message to the client
+      socket.emit("error", "Please pass userData correctly");
+      return;
+    }
+
+    // Pass the user_id
     socket.join(userData._id);
     socket.emit("connected");
   });
@@ -61,23 +69,28 @@ io.on("connection", (socket) => {
     socket.join(room);
     console.log("User Joined Room: " + room);
   });
+
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  socket.on("new message", (newMessageRecieved) => {
-    let chat = newMessageRecieved.chat;
+  socket.on("new message", (newMessageReceived) => {
+    let chat = newMessageReceived.chat;
 
-    if (!chat.users) return console.log("chat.users not defined");
+    // Check if chat and chat.users are defined
+    if (!chat || !chat.users) {
+      console.log("Chat or chat.users not defined");
+      return;
+    }
 
     chat.users.forEach((user) => {
-      if (user._id == newMessageRecieved.sender._id) return;
-
-      socket.in(user._id).emit("message recieved", newMessageRecieved);
+      // Check if user._id is defined and not equal to newMessageReceived.sender._id
+      if (user._id && user._id !== newMessageReceived.sender._id) {
+        socket.in(user._id).emit("message received", newMessageReceived);
+      }
     });
   });
 
-  socket.off("setup", () => {
+  socket.on("disconnect", () => {
     console.log("USER DISCONNECTED");
-    socket.leave(userData._id);
   });
 });
